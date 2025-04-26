@@ -10,4 +10,7 @@ export default defineConfig({
       src: '/src',
     },
   },
+  server: {
+    port: 3000, // 將這裡的 3000 替換成你想要的 port 號碼
+  },
 });

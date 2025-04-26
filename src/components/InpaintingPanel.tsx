@@ -1,43 +1,35 @@
-'use client';
-
 import type React from 'react';
-
 import { useState } from 'react';
 import { Sparkles, Sliders, RefreshCw, ImageIcon } from 'lucide-react';
-import type { GenerationParams } from '../Temptypes';
-import { useTextToImage } from '../hooks/useTextToImage';
 import { useInpainting } from '../hooks/useInpainting';
-import { toast } from 'react-toastify';
 import { AdvancedFilter } from '../types';
 
 const IS_ONLINE = true;
-interface PromptPanelProps {
+
+interface InpaintingPanelProps {
   images?: string[];
   handleImage: (value: string) => void;
   handleLoading: (value: boolean) => void;
+  isGenerating: boolean;
   prompt: string;
   handlePrompt: (value: string) => void;
   filter: AdvancedFilter;
   handleFilter: (filter: AdvancedFilter) => void;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  onGenerate: (prompt: string, params: Record<string, any>) => void;
-  isGenerating: boolean;
 }
 
-const PromptPanel = ({
+export const InpaintingPanel = ({
   images = [],
   handleImage,
   handleLoading,
+  isGenerating,
   prompt,
   handlePrompt,
   filter,
   handleFilter,
-  onGenerate,
-  isGenerating,
-}: PromptPanelProps) => {
+}: InpaintingPanelProps) => {
   const [showAdvanced, setShowAdvanced] = useState(false);
 
-  const textToImageMutation = useTextToImage({
+  const inpaintingMutation = useInpainting({
     options: {
       onStart: () => {
         handleLoading(true);
@@ -45,20 +37,16 @@ const PromptPanel = ({
       onSuccess: (data) => {
         handleLoading(false);
         handleImage(data.base64_images[0]);
-        toast.success('🎨大藝術家，你成功了！', {});
-      },
-      onError: () => {
-        handleLoading(false);
-        toast.error('☠️助手出錯了ＱＱ');
       },
     },
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleInpaintingSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (prompt.trim() && !isGenerating && IS_ONLINE) {
-      textToImageMutation.mutate({
+    if (IS_ONLINE) {
+      inpaintingMutation.mutate({
         text: prompt,
+        image: images[0],
         options: {
           width: filter.width,
           height: filter.height,
@@ -67,7 +55,7 @@ const PromptPanel = ({
     }
   };
 
-  const handleFilterChange = (name: keyof GenerationParams, value: unknown) => {
+  const handleFilterChange = (name: keyof AdvancedFilter, value: unknown) => {
     handleFilter({ ...filter, [name]: value });
   };
 
@@ -152,43 +140,11 @@ const PromptPanel = ({
               />
             </div>
 
-            {/* <div>
-              <label htmlFor='style' className='block text-sm font-medium mb-1'>
-                Style
-              </label>
-              <select
-                id='style'
-                value={filter.style}
-                onChange={(e) => handleFilterChange('style', e.target.value)}
-                className='w-full p-2 bg-gray-600 border border-gray-500 rounded-lg text-white'
-              >
-                <option value='photorealistic'>Photorealistic</option>
-                <option value='anime'>Anime</option>
-                <option value='digital-art'>Digital Art</option>
-                <option value='oil-painting'>Oil Painting</option>
-                <option value='watercolor'>Watercolor</option>
-                <option value='pixel-art'>Pixel Art</option>
-              </select>
-            </div> */}
-
             <div>
               <label htmlFor='seed' className='block text-sm font-medium mb-1'>
                 Seed (Optional)
               </label>
               <div className='flex gap-2'>
-                <input
-                  type='number'
-                  id='seed'
-                  value={filter.seed || ''}
-                  onChange={(e) =>
-                    handleFilterChange(
-                      'seed',
-                      e.target.value ? Number(e.target.value) : undefined
-                    )
-                  }
-                  placeholder='Random'
-                  className='flex-1 p-2 bg-gray-600 border border-gray-500 rounded-lg text-white'
-                />
                 <button
                   type='button'
                   onClick={generateRandomSeed}
@@ -205,7 +161,7 @@ const PromptPanel = ({
           <button
             type='submit'
             disabled={!prompt.trim() || isGenerating}
-            onClick={(e) => handleSubmit(e)}
+            onClick={(e) => handleInpaintingSubmit(e)}
             className={`w-full flex items-center justify-center gap-2 p-3 rounded-lg font-medium ${
               !prompt.trim() || isGenerating
                 ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
@@ -220,7 +176,7 @@ const PromptPanel = ({
             ) : (
               <>
                 <ImageIcon size={20} />
-                Generate Image
+                Inpainting Image
               </>
             )}
           </button>
@@ -239,5 +195,3 @@ const PromptPanel = ({
     </>
   );
 };
-
-export default PromptPanel;
