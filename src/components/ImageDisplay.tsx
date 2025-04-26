@@ -2,6 +2,7 @@ import { Download, Maximize, X } from 'lucide-react';
 import Modal from 'react-modal';
 import { useState } from 'react';
 import { useTextToImage } from '../hooks/useTextToImage';
+import { ImageTypes } from '../types';
 
 const customStyles = {
   content: {
@@ -16,10 +17,10 @@ const customStyles = {
 Modal.setAppElement('body');
 
 interface ImageDisplayProps {
-  images: string[];
+  images: ImageTypes[];
   isLoading: boolean;
-  selectImage: string[];
-  handleSelectImage: (value: string[]) => void;
+  selectImage: ImageTypes[];
+  handleSelectImage: (value: ImageTypes[]) => void;
 }
 
 const ImageDisplay = ({
@@ -66,20 +67,25 @@ const ImageDisplay = ({
       ) : (
         <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
           {images.map((image, index) => {
-            // const imageURL = `data:image/png;base64,${image}`;
-            const imageURL = `${image}`;
-            const isSelect = selectImage.includes(imageURL);
+            const imageURL = `data:image/png;base64,${image.base64}`;
+            // const imageURL = `${image}`;
+            const isSelect = selectImage
+              .map(({ base64 }) => base64)
+              .includes(imageURL);
             return (
               <div
-                key={image}
+                key={image.base64}
                 onClick={() => {
                   if (isSelect) {
                     handleSelectImage(
-                      selectImage.filter((select) => select !== imageURL)
+                      selectImage.filter((select) => select.base64 !== imageURL)
                     );
                     return;
                   }
-                  handleSelectImage([imageURL, ...selectImage]);
+                  handleSelectImage([
+                    { ...image, base64: imageURL },
+                    ...selectImage,
+                  ]);
                 }}
                 className='relative group cursor-pointer'
               >
@@ -112,9 +118,6 @@ const ImageDisplay = ({
                     </button>
                   </div>
                 </div>
-                {/* <div className='mt-2 text-sm text-gray-400 truncate'>
-                {image.prompt}
-              </div> */}
               </div>
             );
           })}
@@ -134,7 +137,7 @@ const ImageDisplay = ({
           color='black'
         />
         <img
-          src={target}
+          src={target ?? ''}
           // alt={image.prompt}
           className='w-full max-w-lg aspect-square object-contain rounded bg-white'
         />

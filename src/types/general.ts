@@ -1,5 +1,39 @@
+export interface ImageTypes {
+  base64: string;
+  prompt: string;
+}
 export interface TextToImagePayloadProps {
   text: string;
+  conditionImage?: string;
+  options: {
+    numberOfImages?: number;
+    width?: number;
+    height?: number;
+    cfgScale?: number;
+    quality?: string;
+    seed?: number;
+  };
+  category?: {
+    designStyles?: string;
+    caseMaterials?: string;
+    coolingMaterials?: string;
+    colorsScheme?: string;
+    lightingDesign?: string;
+    cameraAngles?: string;
+    cameraTemplates?: string;
+  };
+}
+export interface TextToImageResponseProps {
+  image_paths: string[];
+  base64_images: string[];
+  prompt: string;
+}
+export interface InpaintingPayloadProps {
+  text: string;
+  negativeText: string;
+  image: string;
+  maskPrompt: string;
+  maskImage?: string;
   options: {
     numberOfImages?: number;
     width?: number;
@@ -9,16 +43,10 @@ export interface TextToImagePayloadProps {
     seed?: number;
   };
 }
-export interface TextToImageResponseProps {
-  image_paths: string[];
-  base64_images: string[];
-}
-export interface InpaintingPayloadProps {
+export interface VariationPayloadProps {
   text: string;
-  negativeText?: string;
-  image?: string;
-  maskPrompt?: string;
-  maskImage?: string;
+  image: string[];
+  similarityStrength: number;
   options: {
     numberOfImages?: number;
     width?: number;
@@ -32,4 +60,16 @@ export interface AdvancedFilter {
   width: number;
   height: number;
   seed?: number;
+  negativeText?: string;
+  maskPrompt?: string;
+  similarityStrength?: number;
+  category?: {
+    designStyles?: string;
+    caseMaterials?: string;
+    coolingMaterials?: string;
+    colorsScheme?: string;
+    lightingDesign?: string;
+    cameraAngles?: string;
+    cameraTemplates?: string;
+  };
 }

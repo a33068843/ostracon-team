@@ -1,9 +1,9 @@
 import { useMutation } from '@tanstack/react-query';
 import { BASE_URL } from './constants';
-import { InpaintingPayloadProps, TextToImageResponseProps } from '../types';
+import { TextToImageResponseProps, VariationPayloadProps } from '../types';
 import { filterBase64 } from '../utils';
 
-interface useInpaintingProps {
+interface useVariationProps {
   options?: {
     onStart?: () => void;
     onSuccess?: (data: TextToImageResponseProps) => void;
@@ -11,18 +11,16 @@ interface useInpaintingProps {
   };
 }
 
-export const useInpainting = (props: useInpaintingProps) => {
+export const useVariation = (props: useVariationProps) => {
   const { options } = props;
   return useMutation({
-    mutationFn: async (payload: InpaintingPayloadProps) => {
+    mutationFn: async (payload: VariationPayloadProps) => {
       options?.onStart?.();
       const body = {
-        taskType: 'INPAINTING',
-        inPaintingParams: {
+        imageVariationParams: {
           text: payload.text,
-          image: filterBase64(payload.image),
-          ...(payload.negativeText && { negativeText: payload.negativeText }),
-          ...(payload.maskPrompt && { maskPrompt: payload.maskPrompt }),
+          images: payload.image.map((image) => filterBase64(image)),
+          similarityStrength: payload.similarityStrength,
         },
         imageGenerationConfig: {
           numberOfImages: 1,
@@ -32,14 +30,13 @@ export const useInpainting = (props: useInpaintingProps) => {
           quality: 'standard',
         },
       };
-      const response = await fetch(`${BASE_URL}/inpainting`, {
+      const response = await fetch(`${BASE_URL}/variation`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(body),
       });
-      console.log(response);
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }

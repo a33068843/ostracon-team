@@ -1,6 +1,7 @@
 import { useMutation } from '@tanstack/react-query';
 import { BASE_URL } from './constants';
 import { TextToImagePayloadProps, TextToImageResponseProps } from '../types';
+import { filterBase64 } from '../utils';
 
 interface useTextToImageProps {
   options?: {
@@ -14,11 +15,23 @@ export const useTextToImage = (props: useTextToImageProps) => {
   const { options } = props;
   return useMutation({
     mutationFn: async (payload: TextToImagePayloadProps) => {
+      const { category = {} } = payload;
       options?.onStart?.();
+      const newText = `${payload.text} ${(() => {
+        return Object.entries(category)
+          .filter((item) => !!item)
+          .map((item) => {
+            return `, ${item}`;
+          })
+          .join('');
+      })()}`;
       const body = {
         taskType: 'TEXT_IMAGE',
         textImageParams: {
-          text: payload.text,
+          text: newText,
+          ...(payload.conditionImage && {
+            conditionImage: filterBase64(payload.conditionImage),
+          }),
         },
         imageGenerationConfig: {
           numberOfImages: 1,
@@ -40,8 +53,8 @@ export const useTextToImage = (props: useTextToImageProps) => {
       }
       return response.json() as Promise<TextToImageResponseProps>;
     },
-    onSuccess: (data) => {
-      options?.onSuccess?.(data);
+    onSuccess: (data, variable) => {
+      options?.onSuccess?.({ ...data, prompt: variable.text });
     },
     onError(error) {
       options?.onError?.(error);

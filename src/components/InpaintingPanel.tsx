@@ -1,29 +1,37 @@
-import type React from 'react';
 import { useState } from 'react';
 import { Sparkles, Sliders, RefreshCw, ImageIcon } from 'lucide-react';
 import { useInpainting } from '../hooks/useInpainting';
-import { AdvancedFilter } from '../types';
+import { AdvancedFilter, ImageTypes } from '../types';
+import { AdvancedSearch } from './AdvancedSearch';
+import { AIOption } from '../App';
+import { toast } from 'react-toastify';
 
 const IS_ONLINE = true;
 
 interface InpaintingPanelProps {
-  images?: string[];
-  handleImage: (value: string) => void;
+  tab: AIOption;
+  images?: ImageTypes[];
+  handleImage: (value: ImageTypes) => void;
   handleLoading: (value: boolean) => void;
   isGenerating: boolean;
   prompt: string;
   handlePrompt: (value: string) => void;
+  selectImage: ImageTypes[];
+  handleSelectImage: (value: ImageTypes[]) => void;
   filter: AdvancedFilter;
   handleFilter: (filter: AdvancedFilter) => void;
 }
 
 export const InpaintingPanel = ({
+  tab,
   images = [],
   handleImage,
   handleLoading,
   isGenerating,
   prompt,
   handlePrompt,
+  selectImage,
+  handleSelectImage,
   filter,
   handleFilter,
 }: InpaintingPanelProps) => {
@@ -36,7 +44,12 @@ export const InpaintingPanel = ({
       },
       onSuccess: (data) => {
         handleLoading(false);
-        handleImage(data.base64_images[0]);
+        handleImage({ base64: data.base64_images[0], prompt: data.prompt });
+        toast.success('🎨大藝術家，你成功了！');
+      },
+      onError: () => {
+        handleLoading(false);
+        toast.error('☠️助手出錯了ＱＱ');
       },
     },
   });
@@ -46,7 +59,9 @@ export const InpaintingPanel = ({
     if (IS_ONLINE) {
       inpaintingMutation.mutate({
         text: prompt,
-        image: images[0],
+        image: selectImage[0].base64,
+        negativeText: filter.negativeText ?? '',
+        maskPrompt: filter.maskPrompt ?? '',
         options: {
           width: filter.width,
           height: filter.height,
@@ -65,7 +80,7 @@ export const InpaintingPanel = ({
 
   return (
     <>
-      <h2 className='text-2xl font-bold mt-6 mb-2'>Create Image</h2>
+      <h2 className='text-2xl font-bold mt-6 mb-2'>Inpainting Image</h2>
 
       <form>
         <div className='mb-6'>
@@ -84,6 +99,43 @@ export const InpaintingPanel = ({
             <Sparkles
               className='absolute right-3 bottom-3 text-gray-400'
               size={20}
+            />
+          </div>
+        </div>
+
+        <div className='mb-6'>
+          <label htmlFor='prompt' className='block text-sm font-medium mb-2'>
+            Mask Prompt
+          </label>
+          <div className='relative'>
+            <textarea
+              id='mask prompt'
+              value={filter.maskPrompt ?? ''}
+              onChange={(e) => handleFilterChange('maskPrompt', e.target.value)}
+              placeholder='A futuristic cityscape with flying cars and neon lights...'
+              className='w-full p-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:ring-blue-500 focus:border-blue-500 min-h-[120px]'
+              required
+            />
+            <Sparkles
+              className='absolute right-3 bottom-3 text-gray-400'
+              size={20}
+            />
+          </div>
+        </div>
+
+        <div className='mb-6'>
+          <label htmlFor='prompt' className='block text-sm font-medium mb-2'>
+            Negative Text
+          </label>
+          <div className='relative'>
+            <input
+              id='negative text'
+              value={filter.negativeText ?? ''}
+              onChange={(e) =>
+                handleFilterChange('negativeText', e.target.value)
+              }
+              className='w-full p-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:ring-blue-500 focus:border-blue-500 '
+              required
             />
           </div>
         </div>
@@ -145,6 +197,19 @@ export const InpaintingPanel = ({
                 Seed (Optional)
               </label>
               <div className='flex gap-2'>
+                <input
+                  type='number'
+                  id='seed'
+                  value={filter.seed || ''}
+                  onChange={(e) =>
+                    handleFilterChange(
+                      'seed',
+                      e.target.value ? Number(e.target.value) : undefined
+                    )
+                  }
+                  placeholder='Random'
+                  className='flex-1 p-2 bg-gray-600 border border-gray-500 rounded-lg text-white'
+                />
                 <button
                   type='button'
                   onClick={generateRandomSeed}
@@ -154,6 +219,14 @@ export const InpaintingPanel = ({
                 </button>
               </div>
             </div>
+
+            <AdvancedSearch
+              tab={tab}
+              filter={filter}
+              handleFilter={handleFilter}
+              selectImage={selectImage}
+              handleSelectImage={handleSelectImage}
+            />
           </div>
         )}
 

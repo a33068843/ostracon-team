@@ -6,26 +6,30 @@ import type { ImageGenerationResult } from './Temptypes';
 import './App.css';
 import { Sidebar } from './components/Sidebar';
 import { toast } from 'react-toastify';
+import { ImageTypes } from './types';
 
-export type AIOption = 'generateImage' | 'inpainting';
+export type AIOption = 'generateImage' | 'inpainting' | 'variation';
 
 function App() {
   const [generatedImages, setGeneratedImages] = useState<
     ImageGenerationResult[]
   >([]);
-  const [images, setImages] = useState<string[]>([
-    'https://images.pexels.com/photos/1054666/pexels-photo-1054666.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-    'b',
-    'c',
-    'd',
-    'e',
-    'f',
+  const [prompt, setPrompt] = useState('');
+  const [images, setImages] = useState<ImageTypes[]>([
+    // 'https://images.pexels.com/photos/1054666/pexels-photo-1054666.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
+    // 'b',
+    // 'c',
+    // 'd',
+    // 'e',
+    // 'f',
   ]);
   const [isGenerating, setIsGenerating] = useState(false);
   const [tab, setTab] = useState<AIOption>('generateImage');
-  const [selectImage, setSelectImage] = useState<string[]>([]);
-  console.log(selectImage);
+  const [selectImage, setSelectImage] = useState<ImageTypes[]>([]);
 
+  const handlePrompt = (value: string) => {
+    setPrompt(value);
+  };
   const handleGenerate = async (
     prompt: string,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -46,11 +50,11 @@ function App() {
       params,
       timestamp: new Date().toISOString(),
     };
-    setImages([...images, newImage.url]);
+    // setImages([...images, newImage.url]);
     setIsGenerating(false);
     setGeneratedImages((prev) => [newImage, ...prev]);
   };
-  const handleImage = (value: string) => {
+  const handleImage = (value: ImageTypes) => {
     setImages([value, ...images]);
   };
   const handleLoading = (value: boolean) => {
@@ -58,9 +62,9 @@ function App() {
   };
   const handleTab = (value: AIOption) => {
     setTab(value);
-    if (value === 'generateImage' && selectImage.length > 5) {
-      toast.error('最多只能選擇五張圖片 QQ');
-      setSelectImage(selectImage.slice(-5));
+    if (value === 'generateImage' && selectImage.length > 1) {
+      toast.error('最多只能選擇一張圖片 QQ');
+      setSelectImage([selectImage[0]]);
       return;
     }
     if (value === 'inpainting' && selectImage.length > 1) {
@@ -69,16 +73,19 @@ function App() {
       return;
     }
   };
-  const handleSelectImage = (value: string[]) => {
-    if (tab === 'generateImage' && value.length > 5) {
-      toast.error('最多只能選擇五張圖片 QQ');
-      setSelectImage(value.slice(-5));
+  const handleSelectImage = (value: ImageTypes[]) => {
+    if (tab === 'generateImage' && value.length > 1) {
+      toast.error('最多只能選擇一張圖片 QQ');
+      setSelectImage([selectImage[0]]);
       return;
     }
     if (tab === 'inpainting' && value.length > 1) {
       toast.error('最多只能選擇一張圖片 QQ');
       setSelectImage([selectImage[0]]);
       return;
+    }
+    if (tab === 'inpainting' && value.length === 1) {
+      handlePrompt(value[0].prompt);
     }
     setSelectImage(value);
   };
@@ -97,6 +104,8 @@ function App() {
       <Sidebar
         tab={tab}
         handleTab={handleTab}
+        prompt={prompt}
+        handlePrompt={handlePrompt}
         images={images}
         handleImage={handleImage}
         handleLoading={handleLoading}

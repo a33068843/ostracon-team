@@ -1,52 +1,44 @@
-'use client';
-
-import type React from 'react';
-
 import { useState } from 'react';
 import { Sparkles, Sliders, RefreshCw, ImageIcon } from 'lucide-react';
-import type { GenerationParams } from '../Temptypes';
-import { useTextToImage } from '../hooks/useTextToImage';
 import { useInpainting } from '../hooks/useInpainting';
-import { toast } from 'react-toastify';
 import { AdvancedFilter, ImageTypes } from '../types';
 import { AdvancedSearch } from './AdvancedSearch';
 import { AIOption } from '../App';
-import { filterBase64 } from '../utils';
+import { toast } from 'react-toastify';
+import { useVariation } from '../hooks/useVariation';
 
 const IS_ONLINE = true;
-interface PromptPanelProps {
+
+interface VariationPanelProps {
   tab: AIOption;
   images?: ImageTypes[];
   handleImage: (value: ImageTypes) => void;
   handleLoading: (value: boolean) => void;
+  isGenerating: boolean;
   prompt: string;
   handlePrompt: (value: string) => void;
-  filter: AdvancedFilter;
-  handleFilter: (filter: AdvancedFilter) => void;
   selectImage: ImageTypes[];
   handleSelectImage: (value: ImageTypes[]) => void;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  onGenerate: (prompt: string, params: Record<string, any>) => void;
-  isGenerating: boolean;
+  filter: AdvancedFilter;
+  handleFilter: (filter: AdvancedFilter) => void;
 }
 
-const PromptPanel = ({
+export const VariationPanel = ({
   tab,
   images = [],
   handleImage,
   handleLoading,
+  isGenerating,
   prompt,
   handlePrompt,
-  filter,
-  handleFilter,
   selectImage,
   handleSelectImage,
-  onGenerate,
-  isGenerating,
-}: PromptPanelProps) => {
+  filter,
+  handleFilter,
+}: VariationPanelProps) => {
   const [showAdvanced, setShowAdvanced] = useState(false);
 
-  const textToImageMutation = useTextToImage({
+  const variationMutation = useVariation({
     options: {
       onStart: () => {
         handleLoading(true);
@@ -54,7 +46,7 @@ const PromptPanel = ({
       onSuccess: (data) => {
         handleLoading(false);
         handleImage({ base64: data.base64_images[0], prompt: data.prompt });
-        toast.success('🎨大藝術家，你成功了！', {});
+        toast.success('🎨大藝術家，你成功了！');
       },
       onError: () => {
         handleLoading(false);
@@ -65,24 +57,20 @@ const PromptPanel = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (prompt.trim() && !isGenerating && IS_ONLINE) {
-      textToImageMutation.mutate({
+    if (IS_ONLINE) {
+      variationMutation.mutate({
         text: prompt,
-        ...(selectImage.length === 1 && {
-          conditionImage: filterBase64(selectImage[0].base64),
-        }),
+        image: [selectImage[0].base64],
+        similarityStrength: filter.similarityStrength ?? 0,
         options: {
           width: filter.width,
           height: filter.height,
-        },
-        category: {
-          ...filter.category,
         },
       });
     }
   };
 
-  const handleFilterChange = (name: keyof GenerationParams, value: unknown) => {
+  const handleFilterChange = (name: keyof AdvancedFilter, value: unknown) => {
     handleFilter({ ...filter, [name]: value });
   };
 
@@ -92,7 +80,7 @@ const PromptPanel = ({
 
   return (
     <>
-      <h2 className='text-2xl font-bold mt-6 mb-2'>Create Image</h2>
+      <h2 className='text-2xl font-bold mt-6 mb-2'>Variation Image</h2>
 
       <form>
         <div className='mb-6'>
@@ -113,6 +101,24 @@ const PromptPanel = ({
               size={20}
             />
           </div>
+        </div>
+
+        <div className='mb-6'>
+          <label htmlFor='width' className='block text-sm font-medium mb-1'>
+            Similarity Strength: {filter.similarityStrength}
+          </label>
+          <input
+            type='range'
+            id='similarity'
+            min='0'
+            max='1'
+            step='0.01'
+            value={filter.similarityStrength}
+            onChange={(e) =>
+              handleFilterChange('similarityStrength', Number(e.target.value))
+            }
+            className='w-full h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer'
+          />
         </div>
 
         <div className='mb-6'>
@@ -167,25 +173,6 @@ const PromptPanel = ({
               />
             </div>
 
-            {/* <div>
-              <label htmlFor='style' className='block text-sm font-medium mb-1'>
-                Style
-              </label>
-              <select
-                id='style'
-                value={filter.style}
-                onChange={(e) => handleFilterChange('style', e.target.value)}
-                className='w-full p-2 bg-gray-600 border border-gray-500 rounded-lg text-white'
-              >
-                <option value='photorealistic'>Photorealistic</option>
-                <option value='anime'>Anime</option>
-                <option value='digital-art'>Digital Art</option>
-                <option value='oil-painting'>Oil Painting</option>
-                <option value='watercolor'>Watercolor</option>
-                <option value='pixel-art'>Pixel Art</option>
-              </select>
-            </div> */}
-
             <div>
               <label htmlFor='seed' className='block text-sm font-medium mb-1'>
                 Seed (Optional)
@@ -227,7 +214,7 @@ const PromptPanel = ({
         <div className='flex gap-2'>
           <button
             type='submit'
-            disabled={!prompt.trim() || isGenerating}
+            disabled={!prompt.trim() || selectImage.length < 1 || isGenerating}
             onClick={(e) => handleSubmit(e)}
             className={`w-full flex items-center justify-center gap-2 p-3 rounded-lg font-medium ${
               !prompt.trim() || isGenerating
@@ -243,7 +230,7 @@ const PromptPanel = ({
             ) : (
               <>
                 <ImageIcon size={20} />
-                Generate Image
+                Variation Image
               </>
             )}
           </button>
@@ -262,5 +249,3 @@ const PromptPanel = ({
     </>
   );
 };
-
-export default PromptPanel;

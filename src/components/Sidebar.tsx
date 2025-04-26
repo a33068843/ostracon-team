@@ -2,16 +2,19 @@ import { useState } from 'react';
 import { AIOption } from '../App';
 import { InpaintingPanel } from './InpaintingPanel';
 import PromptPanel from './PromptPanel';
-import { AdvancedFilter } from '../types';
+import { AdvancedFilter, ImageTypes } from '../types';
+import { VariationPanel } from './VariationPanel';
 
 interface SidebarProps {
   tab: AIOption;
   handleTab: (v: AIOption) => void;
-  images?: string[];
-  handleImage: (value: string) => void;
+  prompt: string;
+  handlePrompt: (value: string) => void;
+  images?: ImageTypes[];
+  handleImage: (value: ImageTypes) => void;
   handleLoading: (value: boolean) => void;
-  selectImage: string[];
-  handleSelectImage: (value: string[]) => void;
+  selectImage: ImageTypes[];
+  handleSelectImage: (value: ImageTypes[]) => void;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onGenerate: (prompt: string, params: Record<string, any>) => void;
   isGenerating: boolean;
@@ -20,6 +23,8 @@ export const Sidebar = (props: SidebarProps) => {
   const {
     tab,
     handleTab,
+    prompt,
+    handlePrompt,
     images,
     handleImage,
     selectImage,
@@ -28,21 +33,34 @@ export const Sidebar = (props: SidebarProps) => {
     onGenerate,
     isGenerating,
   } = props;
-  const [prompt, setPrompt] = useState('');
   const [filter, setFilter] = useState<AdvancedFilter>({
     width: 512,
     height: 512,
     seed: 0,
+    similarityStrength: 0.6,
+    category: {
+      designStyles: '',
+      caseMaterials: '',
+      coolingMaterials: '',
+      colorsScheme: '',
+      lightingDesign: '',
+      cameraAngles: '',
+      cameraTemplates: '',
+    },
   });
   const isGenerateTab = tab === 'generateImage';
   const isInpaintingTab = tab === 'inpainting';
+  const isVariationTab = tab === 'variation';
   const activeStyle = `border-orange-400 bg-orange-400 text-white`;
 
-  const handlePrompt = (value: string) => {
-    setPrompt(value);
-  };
   const handleFilter = (filter: AdvancedFilter) => {
     setFilter(filter);
+  };
+  const handleCustomTab = (tab: AIOption) => {
+    handleTab(tab);
+    if (tab === 'inpainting' && selectImage.length === 1) {
+      handlePrompt(selectImage[0].prompt);
+    }
   };
 
   return (
@@ -50,27 +68,36 @@ export const Sidebar = (props: SidebarProps) => {
       <div className='flex flex-column'>
         <p className='text-lg font-bold mb-2'>生成類別</p>
       </div>
-      <div className={`flex gap-2 mb-2 `}>
+      <div className={`flex gap-2 mb-2 flex-wrap `}>
         <div
-          onClick={() => handleTab('generateImage')}
-          className={`flex justify-center items-center px-4 py-1 duration-200 border rounded border-gray-700 text-sm font-normal cursor-pointer ${
+          onClick={() => handleCustomTab('generateImage')}
+          className={`min-w-[100px] flex justify-center items-center px-4 py-1 duration-200 border rounded border-gray-700 text-sm font-normal cursor-pointer ${
             isGenerateTab && activeStyle
           }`}
         >
           Generate
         </div>
         <div
-          onClick={() => handleTab('inpainting')}
-          className={`flex justify-center items-center px-4 py-1 duration-200 border rounded border-gray-700 text-sm font-normal cursor-pointer ${
+          onClick={() => handleCustomTab('inpainting')}
+          className={`min-w-[100px] flex justify-center items-center px-4 py-1 duration-200 border rounded border-gray-700 text-sm font-normal cursor-pointer ${
             isInpaintingTab && activeStyle
           }`}
         >
           Inpainting
         </div>
+        <div
+          onClick={() => handleCustomTab('variation')}
+          className={`min-w-[100px] flex justify-center items-center px-4 py-1 duration-200 border rounded border-gray-700 text-sm font-normal cursor-pointer ${
+            isVariationTab && activeStyle
+          }`}
+        >
+          Variation
+        </div>
       </div>
 
       {isGenerateTab && (
         <PromptPanel
+          tab={tab}
           images={images}
           handleImage={handleImage}
           handleLoading={handleLoading}
@@ -80,11 +107,32 @@ export const Sidebar = (props: SidebarProps) => {
           handlePrompt={handlePrompt}
           filter={filter}
           handleFilter={handleFilter}
+          selectImage={selectImage}
+          handleSelectImage={handleSelectImage}
         />
       )}
       {isInpaintingTab && (
         <InpaintingPanel
+          tab={tab}
           images={images}
+          selectImage={selectImage}
+          handleSelectImage={handleSelectImage}
+          handleImage={handleImage}
+          handleLoading={handleLoading}
+          isGenerating={isGenerating}
+          prompt={prompt}
+          handlePrompt={handlePrompt}
+          filter={filter}
+          handleFilter={handleFilter}
+        />
+      )}
+
+      {isVariationTab && (
+        <VariationPanel
+          tab={tab}
+          images={images}
+          selectImage={selectImage}
+          handleSelectImage={handleSelectImage}
           handleImage={handleImage}
           handleLoading={handleLoading}
           isGenerating={isGenerating}
