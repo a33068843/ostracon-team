@@ -240,7 +240,7 @@ export const VariationPanel = ({
             disabled={!prompt.trim() || selectImage.length < 1 || isGenerating}
             onClick={(e) => handleSubmit(e)}
             className={`w-full flex items-center justify-center gap-2 p-3 rounded-lg font-medium ${
-              !prompt.trim() || isGenerating
+              !prompt.trim() || selectImage.length < 1 || isGenerating
                 ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
                 : 'bg-blue-600 hover:bg-blue-700 text-white'
             }`}

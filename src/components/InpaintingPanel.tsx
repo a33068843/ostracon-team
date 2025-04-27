@@ -256,10 +256,10 @@ export const InpaintingPanel = ({
         <div className='flex gap-2'>
           <button
             type='submit'
-            disabled={!prompt.trim() || isGenerating}
+            disabled={!prompt.trim() || selectImage.length < 1 || isGenerating}
             onClick={(e) => handleInpaintingSubmit(e)}
             className={`w-full flex items-center justify-center gap-2 p-3 rounded-lg font-medium ${
-              !prompt.trim() || isGenerating
+              !prompt.trim() || selectImage.length < 1 || isGenerating
                 ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
                 : 'bg-blue-600 hover:bg-blue-700 text-white'
             }`}
