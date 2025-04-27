@@ -11,7 +11,7 @@ const IS_ONLINE = true;
 interface InpaintingPanelProps {
   tab: AIOption;
   images?: ImageTypes[];
-  handleImage: (value: ImageTypes) => void;
+  handleImage: (value: ImageTypes[]) => void;
   handleLoading: (value: boolean) => void;
   isGenerating: boolean;
   prompt: string;
@@ -44,7 +44,13 @@ export const InpaintingPanel = ({
       },
       onSuccess: (data) => {
         handleLoading(false);
-        handleImage({ base64: data.base64_images[0], prompt: data.prompt });
+
+        handleImage(
+          data.base64_images.map((item) => ({
+            base64: item,
+            prompt: data.prompt,
+          }))
+        );
         toast.success('🎨大藝術家，你成功了！');
       },
       onError: () => {
@@ -65,6 +71,9 @@ export const InpaintingPanel = ({
         options: {
           width: filter.width,
           height: filter.height,
+          seed: filter.seed,
+          cfgScale: filter.cfgScale,
+          numberOfImages: filter.numberOfImages,
         },
       });
     }

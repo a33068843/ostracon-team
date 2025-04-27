@@ -15,6 +15,7 @@ export const useTextToImage = (props: useTextToImageProps) => {
   const { options } = props;
   return useMutation({
     mutationFn: async (payload: TextToImagePayloadProps) => {
+      console.log(payload);
       const { category = {} } = payload;
       options?.onStart?.();
       const newText = `${payload.text} ${(() => {
@@ -34,11 +35,12 @@ export const useTextToImage = (props: useTextToImageProps) => {
           }),
         },
         imageGenerationConfig: {
-          numberOfImages: 1,
+          numberOfImages: payload.options.numberOfImages,
           width: payload.options.width,
           height: payload.options.height,
-          cfgScale: 3.5,
+          cfgScale: payload.options.cfgScale,
           quality: 'standard',
+          seed: payload.options.seed,
         },
       };
       const response = await fetch(`${BASE_URL}/text-to-image`, {
@@ -54,6 +56,7 @@ export const useTextToImage = (props: useTextToImageProps) => {
       return response.json() as Promise<TextToImageResponseProps>;
     },
     onSuccess: (data, variable) => {
+      console.log(data);
       options?.onSuccess?.({ ...data, prompt: variable.text });
     },
     onError(error) {

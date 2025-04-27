@@ -54,9 +54,11 @@ function App() {
     setIsGenerating(false);
     setGeneratedImages((prev) => [newImage, ...prev]);
   };
-  const handleImage = (value: ImageTypes) => {
-    setImages([value, ...images]);
+  const handleImage = (value: ImageTypes[]) => {
+    console.log(value);
+    setImages([...value, ...images]);
   };
+  console.log(images);
   const handleLoading = (value: boolean) => {
     setIsGenerating(value);
   };

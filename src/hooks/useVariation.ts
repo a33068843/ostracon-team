@@ -23,11 +23,12 @@ export const useVariation = (props: useVariationProps) => {
           similarityStrength: payload.similarityStrength,
         },
         imageGenerationConfig: {
-          numberOfImages: 1,
+          numberOfImages: payload.options.numberOfImages,
           width: payload.options.width,
           height: payload.options.height,
-          cfgScale: 3.5,
+          cfgScale: payload.options.cfgScale,
           quality: 'standard',
+          seed: payload.options.seed,
         },
       };
       const response = await fetch(`${BASE_URL}/variation`, {

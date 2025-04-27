@@ -54,7 +54,7 @@ export const AdvancedSearch = (props: AdvancedSearchProps) => {
       };
 
       reader.onerror = () => {
-        toast.error('出錯啦白痴');
+        toast.error('出錯啦');
       };
 
       // 開始讀取檔案，並將其轉換為 Data URL (Base64 編碼)
@@ -126,6 +126,42 @@ export const AdvancedSearch = (props: AdvancedSearchProps) => {
             </>
           )}
         </div>
+      </div>
+
+      <div className='mt-4 mb-6'>
+        <label htmlFor='cfgScale' className='block text-sm font-medium mb-1'>
+          Cfg Scale: {filter.cfgScale}
+        </label>
+        <input
+          type='range'
+          id='cfgScale'
+          min='1.1'
+          max='10'
+          step='0.01'
+          value={filter.cfgScale}
+          onChange={(e) =>
+            handleFilterChange('cfgScale', Number(e.target.value))
+          }
+          className='w-full h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer'
+        />
+      </div>
+
+      <div className='mb-6'>
+        <label htmlFor='cfgScale' className='block text-sm font-medium mb-1'>
+          Number Of Images {filter.numberOfImages}
+        </label>
+        <input
+          type='range'
+          id='cfgScale'
+          min='1'
+          max='5'
+          step='1'
+          value={filter.numberOfImages}
+          onChange={(e) =>
+            handleFilterChange('numberOfImages', Number(e.target.value))
+          }
+          className='w-full h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer'
+        />
       </div>
 
       <div className='mt-4'>

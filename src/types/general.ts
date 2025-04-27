@@ -63,6 +63,8 @@ export interface AdvancedFilter {
   negativeText?: string;
   maskPrompt?: string;
   similarityStrength?: number;
+  cfgScale: number;
+  numberOfImages: number;
   category?: {
     designStyles?: string;
     caseMaterials?: string;

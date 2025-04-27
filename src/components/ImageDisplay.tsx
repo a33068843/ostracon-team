@@ -1,8 +1,11 @@
 import { Download, Maximize, X } from 'lucide-react';
 import Modal from 'react-modal';
-import { useState } from 'react';
+import { use, useState } from 'react';
 import { useTextToImage } from '../hooks/useTextToImage';
 import { ImageTypes } from '../types';
+import { toast } from 'react-toastify';
+import { useVariation } from '../hooks/useVariation';
+import { useSearch } from '../hooks/useSearch';
 
 const customStyles = {
   content: {
@@ -30,6 +33,30 @@ const ImageDisplay = ({
   handleSelectImage,
 }: ImageDisplayProps) => {
   const [target, setTarget] = useState('');
+  const [isLoadingSearch, setIsLoadingSearch] = useState(false);
+
+  const searchMutation = useSearch({
+    options: {
+      onStart: () => {
+        setIsLoadingSearch(true);
+      },
+      onSuccess: (data) => {
+        setIsLoadingSearch(false);
+
+        // handleImage(
+        //   data.base64_images.map((item) => ({
+        //     base64: item,
+        //     prompt: data.prompt,
+        //   }))
+        // );
+        toast.success('搜尋結果出爐啦');
+      },
+      onError: () => {
+        setIsLoadingSearch(false);
+        toast.error('☠️助手出錯了ＱＱ');
+      },
+    },
+  });
 
   const handleDownload = (name: string, image: string) => {
     const downloadLink = document.createElement('a');
@@ -46,7 +73,7 @@ const ImageDisplay = ({
 
   return (
     <div className='w-full md:w-2/3 h-full overflow-auto p-6 border-r border-gray-700'>
-      <h2 className='text-2xl font-bold mb-6'>Generated Images</h2>
+      <h2 className='text-2xl font-bold mb-6'>Current Generate</h2>
 
       {isLoading && (
         <div className='flex flex-col items-center justify-center p-8 border border-gray-700 rounded-lg bg-gray-800 mb-6 '>
@@ -54,8 +81,7 @@ const ImageDisplay = ({
           <p className='text-gray-400'>Generating your masterpiece...</p>
         </div>
       )}
-
-      {images.length === 0 && !isLoading ? (
+      {!isLoading && images.length === 0 && (
         <div className='flex flex-col items-center justify-center h-128 p-8 border border-gray-700 rounded-lg bg-gray-800 aspect-square'>
           <p className='text-gray-400 text-center mb-4'>
             No images generated yet
@@ -64,7 +90,18 @@ const ImageDisplay = ({
             Enter a prompt on the right panel to create your first image
           </p>
         </div>
-      ) : (
+      )}
+      {!isLoading && images.length > 0 && (
+        <div className='flex flex-col items-center justify-center p-8 border border-gray-700 rounded-lg bg-gray-800 mb-6 '>
+          <img src={`data:image/png;base64,${images[0].base64}`} />
+        </div>
+      )}
+
+      <h2 className='text-2xl font-bold mb-6 mt-6'>Search Result</h2>
+
+      <h2 className='text-2xl font-bold mb-6'>Generated Images</h2>
+
+      {images.length > 0 && (
         <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
           {images.map((image, index) => {
             const imageURL = `data:image/png;base64,${image.base64}`;

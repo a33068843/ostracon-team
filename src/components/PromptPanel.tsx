@@ -17,7 +17,7 @@ const IS_ONLINE = true;
 interface PromptPanelProps {
   tab: AIOption;
   images?: ImageTypes[];
-  handleImage: (value: ImageTypes) => void;
+  handleImage: (value: ImageTypes[]) => void;
   handleLoading: (value: boolean) => void;
   prompt: string;
   handlePrompt: (value: string) => void;
@@ -53,7 +53,13 @@ const PromptPanel = ({
       },
       onSuccess: (data) => {
         handleLoading(false);
-        handleImage({ base64: data.base64_images[0], prompt: data.prompt });
+        console.log(data);
+        handleImage(
+          data.base64_images.map((item) => ({
+            base64: item,
+            prompt: data.prompt,
+          }))
+        );
         toast.success('🎨大藝術家，你成功了！', {});
       },
       onError: () => {
@@ -74,6 +80,9 @@ const PromptPanel = ({
         options: {
           width: filter.width,
           height: filter.height,
+          seed: filter.seed,
+          cfgScale: filter.cfgScale,
+          numberOfImages: filter.numberOfImages,
         },
         category: {
           ...filter.category,
