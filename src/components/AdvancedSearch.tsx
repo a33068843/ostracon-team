@@ -283,34 +283,10 @@ export const AdvancedSearch = (props: AdvancedSearchProps) => {
       </div>
       <div className='mt-4'>
         <label
-          htmlFor='cameraAngles'
-          className='block text-sm font-medium mb-1'
-        >
-          Camera Angles
-        </label>
-        <select
-          id='cameraAngles'
-          value={filter.category?.cameraAngles}
-          onChange={(e) =>
-            handleFilterChange('category', e.target.value, 'cameraAngles')
-          }
-          className='w-full p-2 bg-gray-600 border border-gray-500 rounded-lg text-white'
-        >
-          {cameraAngles.map((item) => {
-            return (
-              <option key={item.key} value={item.description}>
-                {item.key}
-              </option>
-            );
-          })}
-        </select>
-      </div>
-      <div className='mt-4'>
-        <label
           htmlFor='cameraTemplates'
           className='block text-sm font-medium mb-1'
         >
-          Camera Templates
+          Camera Angles
         </label>
         <select
           id='cameraTemplates'

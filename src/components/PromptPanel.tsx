@@ -3,7 +3,13 @@
 import type React from 'react';
 
 import { useState } from 'react';
-import { Sparkles, Sliders, RefreshCw, ImageIcon } from 'lucide-react';
+import {
+  Sparkles,
+  Sliders,
+  RefreshCw,
+  ImageIcon,
+  PackageSearch,
+} from 'lucide-react';
 import type { GenerationParams } from '../Temptypes';
 import { useTextToImage } from '../hooks/useTextToImage';
 import { useInpainting } from '../hooks/useInpainting';
@@ -68,7 +74,7 @@ const PromptPanel = ({
       },
       onError: () => {
         handleLoading(false);
-        toast.error('☠️助手出錯了ＱＱ');
+        toast.error('☠️ 模型忙碌中，請稍後再試ＱＱ');
       },
     },
   });
@@ -76,11 +82,10 @@ const PromptPanel = ({
     options: {
       onSuccess: (data) => {
         handleSearchImage([...data.results[0].image_urls]);
-        handlePrompt(data.optimized_prompt);
-        toast.success('優化結果出爐啦');
+        toast.success('搜尋結果出爐啦');
       },
       onError: () => {
-        toast.error('☠️助手出錯了ＱＱ');
+        toast.error('☠️ 模型忙碌中，請稍後再試ＱＱ');
       },
     },
   });
@@ -160,7 +165,7 @@ const PromptPanel = ({
               required
             />
             <div className='absolute flex items-center justify-center gap-1 right-3 bottom-3'>
-              <Sparkles
+              <PackageSearch
                 onClick={handleOptimize}
                 className={` text-gray-400 ${
                   searchMutation.isPending ? 'cursor-default' : 'cursor-pointer'
@@ -169,7 +174,7 @@ const PromptPanel = ({
                 color={searchMutation.isPending ? '#8200da' : '#D1D5DB'}
               />
               {searchMutation.isPending && (
-                <p className='text-purple-600'>Generating...</p>
+                <p className='text-purple-600'>Searching...</p>
               )}
             </div>
           </div>

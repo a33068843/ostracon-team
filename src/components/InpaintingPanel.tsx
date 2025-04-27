@@ -5,7 +5,6 @@ import { AdvancedFilter, defaultFilter, ImageTypes } from '../types';
 import { AdvancedSearch } from './AdvancedSearch';
 import { AIOption } from '../App';
 import { toast } from 'react-toastify';
-import React from 'react';
 
 const IS_ONLINE = true;
 
@@ -56,7 +55,7 @@ export const InpaintingPanel = ({
       },
       onError: () => {
         handleLoading(false);
-        toast.error('☠️助手出錯了ＱＱ');
+        toast.error('☠️ 模型忙碌中，請稍後再試ＱＱ');
       },
     },
   });
