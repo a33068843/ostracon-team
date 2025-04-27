@@ -23,6 +23,7 @@ function App() {
     // 'e',
     // 'f',
   ]);
+  const [searchImages, setSearchImages] = useState<string[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
   const [tab, setTab] = useState<AIOption>('generateImage');
   const [selectImage, setSelectImage] = useState<ImageTypes[]>([]);
@@ -55,10 +56,11 @@ function App() {
     setGeneratedImages((prev) => [newImage, ...prev]);
   };
   const handleImage = (value: ImageTypes[]) => {
-    console.log(value);
     setImages([...value, ...images]);
   };
-  console.log(images);
+  const handleSearchImage = (value: string[]) => {
+    setSearchImages([...value]);
+  };
   const handleLoading = (value: boolean) => {
     setIsGenerating(value);
   };
@@ -102,6 +104,8 @@ function App() {
         isLoading={isGenerating}
         selectImage={selectImage}
         handleSelectImage={handleSelectImage}
+        searchImages={searchImages}
+        handleSearchImage={handleSearchImage}
       />
       <Sidebar
         tab={tab}
@@ -110,6 +114,8 @@ function App() {
         handlePrompt={handlePrompt}
         images={images}
         handleImage={handleImage}
+        searchImages={searchImages}
+        handleSearchImage={handleSearchImage}
         handleLoading={handleLoading}
         onGenerate={handleGenerate}
         isGenerating={isGenerating}

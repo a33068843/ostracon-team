@@ -15,12 +15,11 @@ export const useTextToImage = (props: useTextToImageProps) => {
   const { options } = props;
   return useMutation({
     mutationFn: async (payload: TextToImagePayloadProps) => {
-      console.log(payload);
       const { category = {} } = payload;
       options?.onStart?.();
       const newText = `${payload.text} ${(() => {
         return Object.entries(category)
-          .filter((item) => !!item)
+          .filter((item) => !!item[1])
           .map((item) => {
             return `, ${item}`;
           })
@@ -56,7 +55,6 @@ export const useTextToImage = (props: useTextToImageProps) => {
       return response.json() as Promise<TextToImageResponseProps>;
     },
     onSuccess: (data, variable) => {
-      console.log(data);
       options?.onSuccess?.({ ...data, prompt: variable.text });
     },
     onError(error) {

@@ -1,11 +1,11 @@
 import { useMutation } from '@tanstack/react-query';
 import { BASE_URL } from './constants';
-import { TextToImageResponseProps } from '../types';
+import { SearchResponseProps } from '../types';
 
 interface useSearchProps {
   options?: {
     onStart?: () => void;
-    onSuccess?: (data: TextToImageResponseProps) => void;
+    onSuccess?: (data: SearchResponseProps) => void;
     onError?: (error: Error) => void;
   };
 }
@@ -24,7 +24,7 @@ export const useSearch = (props: useSearchProps) => {
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
-      return response.json() as Promise<TextToImageResponseProps>;
+      return response.json() as Promise<SearchResponseProps>;
     },
     onSuccess: (data) => {
       options?.onSuccess?.(data);

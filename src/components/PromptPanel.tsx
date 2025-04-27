@@ -12,6 +12,7 @@ import { AdvancedFilter, ImageTypes } from '../types';
 import { AdvancedSearch } from './AdvancedSearch';
 import { AIOption } from '../App';
 import { filterBase64 } from '../utils';
+import { useSearch } from '../hooks/useSearch';
 
 const IS_ONLINE = true;
 interface PromptPanelProps {
@@ -21,6 +22,8 @@ interface PromptPanelProps {
   handleLoading: (value: boolean) => void;
   prompt: string;
   handlePrompt: (value: string) => void;
+  searchImages?: string[];
+  handleSearchImage: (value: string[]) => void;
   filter: AdvancedFilter;
   handleFilter: (filter: AdvancedFilter) => void;
   selectImage: ImageTypes[];
@@ -37,6 +40,8 @@ const PromptPanel = ({
   handleLoading,
   prompt,
   handlePrompt,
+  searchImages,
+  handleSearchImage,
   filter,
   handleFilter,
   selectImage,
@@ -53,7 +58,6 @@ const PromptPanel = ({
       },
       onSuccess: (data) => {
         handleLoading(false);
-        console.log(data);
         handleImage(
           data.base64_images.map((item) => ({
             base64: item,
@@ -64,6 +68,18 @@ const PromptPanel = ({
       },
       onError: () => {
         handleLoading(false);
+        toast.error('☠️助手出錯了ＱＱ');
+      },
+    },
+  });
+  const searchMutation = useSearch({
+    options: {
+      onSuccess: (data) => {
+        handleSearchImage([...data.results[0].image_urls]);
+        handlePrompt(data.optimized_prompt);
+        toast.success('優化結果出爐啦');
+      },
+      onError: () => {
         toast.error('☠️助手出錯了ＱＱ');
       },
     },
@@ -91,6 +107,19 @@ const PromptPanel = ({
     }
   };
 
+  const handleOptimize = () => {
+    if (searchMutation.isPending) return;
+    const defaultCate = filter.category ?? {};
+    const newText = `${prompt} ${(() => {
+      return Object.entries(defaultCate)
+        .filter((item) => !!item[1])
+        .map((item) => {
+          return `, ${item}`;
+        })
+        .join('');
+    })()}`;
+    searchMutation.mutate(newText);
+  };
   const handleFilterChange = (name: keyof GenerationParams, value: unknown) => {
     handleFilter({ ...filter, [name]: value });
   };
@@ -117,10 +146,19 @@ const PromptPanel = ({
               className='w-full p-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:ring-blue-500 focus:border-blue-500 min-h-[120px]'
               required
             />
-            <Sparkles
-              className='absolute right-3 bottom-3 text-gray-400'
-              size={20}
-            />
+            <div className='absolute flex items-center justify-center gap-1 right-3 bottom-3'>
+              <Sparkles
+                onClick={handleOptimize}
+                className={` text-gray-400 ${
+                  searchMutation.isPending ? 'cursor-default' : 'cursor-pointer'
+                }`}
+                size={20}
+                color={searchMutation.isPending ? '#8200da' : '#D1D5DB'}
+              />
+              {searchMutation.isPending && (
+                <p className='text-purple-600'>Generating...</p>
+              )}
+            </div>
           </div>
         </div>
 
@@ -236,10 +274,12 @@ const PromptPanel = ({
         <div className='flex gap-2'>
           <button
             type='submit'
-            disabled={!prompt.trim() || isGenerating}
+            disabled={
+              !prompt.trim() || searchMutation.isPending || isGenerating
+            }
             onClick={(e) => handleSubmit(e)}
             className={`w-full flex items-center justify-center gap-2 p-3 rounded-lg font-medium ${
-              !prompt.trim() || isGenerating
+              !prompt.trim() || searchMutation.isPending || isGenerating
                 ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
                 : 'bg-blue-600 hover:bg-blue-700 text-white'
             }`}

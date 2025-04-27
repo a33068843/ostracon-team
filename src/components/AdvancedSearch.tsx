@@ -95,7 +95,7 @@ export const AdvancedSearch = (props: AdvancedSearchProps) => {
               <input
                 type='file'
                 id='file_input'
-                accept='image/*'
+                accept='image/jpeg, image/png'
                 onChange={handleUpload}
                 className='hidden'
               />

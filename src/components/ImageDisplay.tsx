@@ -24,6 +24,8 @@ interface ImageDisplayProps {
   isLoading: boolean;
   selectImage: ImageTypes[];
   handleSelectImage: (value: ImageTypes[]) => void;
+  searchImages?: string[];
+  handleSearchImage: (value: string[]) => void;
 }
 
 const ImageDisplay = ({
@@ -31,32 +33,10 @@ const ImageDisplay = ({
   isLoading,
   selectImage,
   handleSelectImage,
+  searchImages = [],
+  handleSearchImage,
 }: ImageDisplayProps) => {
   const [target, setTarget] = useState('');
-  const [isLoadingSearch, setIsLoadingSearch] = useState(false);
-
-  const searchMutation = useSearch({
-    options: {
-      onStart: () => {
-        setIsLoadingSearch(true);
-      },
-      onSuccess: (data) => {
-        setIsLoadingSearch(false);
-
-        // handleImage(
-        //   data.base64_images.map((item) => ({
-        //     base64: item,
-        //     prompt: data.prompt,
-        //   }))
-        // );
-        toast.success('搜尋結果出爐啦');
-      },
-      onError: () => {
-        setIsLoadingSearch(false);
-        toast.error('☠️助手出錯了ＱＱ');
-      },
-    },
-  });
 
   const handleDownload = (name: string, image: string) => {
     const downloadLink = document.createElement('a');
@@ -98,8 +78,67 @@ const ImageDisplay = ({
       )}
 
       <h2 className='text-2xl font-bold mb-6 mt-6'>Search Result</h2>
+      {searchImages.length > 0 && (
+        <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
+          {searchImages.map((image, index) => {
+            const imageURL = `${image}`;
+            // const imageURL = `${image}`;
+            const isSelect = selectImage
+              .map(({ base64 }) => base64)
+              .includes(imageURL);
+            return (
+              <div
+                key={image}
+                onClick={() => {
+                  if (isSelect) {
+                    handleSelectImage(
+                      selectImage.filter((select) => select.base64 !== imageURL)
+                    );
+                    return;
+                  }
+                  handleSelectImage([
+                    { base64: imageURL, prompt: '' },
+                    ...selectImage,
+                  ]);
+                }}
+                className='relative group cursor-pointer'
+              >
+                <img
+                  src={imageURL}
+                  alt='ERROR'
+                  className={`w-full aspect-square object-cover rounded-lg border border-gray-700 bg-gray-800 ${
+                    isSelect && `border-2 border-orange-400`
+                  }`}
+                />
+                <div className='absolute inset-0 bg-opacity-0 group-hover:bg-opacity-60 transition-all duration-300 rounded-lg flex items-end justify-end opacity-0 group-hover:opacity-100 p-2'>
+                  <div className='flex gap-2'>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDownload(`${index}`, imageURL);
+                      }}
+                      className='p-2 bg-gray-800 rounded-full hover:bg-gray-700 cursor-pointer'
+                    >
+                      <Download size={20} />
+                    </button>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleExpand(imageURL);
+                      }}
+                      className='p-2 bg-gray-800 rounded-full hover:bg-gray-700 cursor-pointer'
+                    >
+                      <Maximize size={20} />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
 
-      <h2 className='text-2xl font-bold mb-6'>Generated Images</h2>
+      <h2 className='text-2xl font-bold mb-6 mt-6'>Generated Images</h2>
 
       {images.length > 0 && (
         <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>

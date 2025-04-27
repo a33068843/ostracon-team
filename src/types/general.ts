@@ -28,6 +28,13 @@ export interface TextToImageResponseProps {
   base64_images: string[];
   prompt: string;
 }
+export interface SearchResponseProps {
+  original_prompt: string;
+  optimized_prompt: string;
+  results: {
+    image_urls: string[];
+  }[];
+}
 export interface InpaintingPayloadProps {
   text: string;
   negativeText: string;

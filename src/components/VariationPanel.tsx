@@ -105,10 +105,10 @@ export const VariationPanel = ({
               className='w-full p-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:ring-blue-500 focus:border-blue-500 min-h-[120px]'
               required
             />
-            <Sparkles
+            {/* <Sparkles
               className='absolute right-3 bottom-3 text-gray-400'
               size={20}
-            />
+            /> */}
           </div>
         </div>
 

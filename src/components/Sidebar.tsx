@@ -12,6 +12,8 @@ interface SidebarProps {
   handlePrompt: (value: string) => void;
   images?: ImageTypes[];
   handleImage: (value: ImageTypes[]) => void;
+  searchImages?: string[];
+  handleSearchImage: (value: string[]) => void;
   handleLoading: (value: boolean) => void;
   selectImage: ImageTypes[];
   handleSelectImage: (value: ImageTypes[]) => void;
@@ -27,6 +29,8 @@ export const Sidebar = (props: SidebarProps) => {
     handlePrompt,
     images,
     handleImage,
+    searchImages,
+    handleSearchImage,
     selectImage,
     handleSelectImage,
     handleLoading,
@@ -68,7 +72,7 @@ export const Sidebar = (props: SidebarProps) => {
 
   return (
     <div className='w-full md:w-1/3 h-full overflow-auto p-6 bg-gray-800'>
-      <div className='flex flex-column'>
+      {/* <div className='flex flex-column'>
         <p className='text-lg font-bold mb-2'>Search History Database</p>
       </div>
       <div className='flex items-center justify-center gap-1 mb-4'>
@@ -82,10 +86,10 @@ export const Sidebar = (props: SidebarProps) => {
         <button className='px-1 py-1 bg-orange-400 rounded text-xs cursor-pointer hover:brightness-90 duration-200 active:brightness-80'>
           Search
         </button>
-      </div>
+      </div> */}
 
       <div className='flex flex-column'>
-        <p className='text-lg font-bold mb-2'>生成類別</p>
+        <p className='text-lg font-bold mb-2'>Actions</p>
       </div>
       <div className={`flex gap-2 mb-2 flex-wrap `}>
         <div
@@ -124,6 +128,8 @@ export const Sidebar = (props: SidebarProps) => {
           isGenerating={isGenerating}
           prompt={prompt}
           handlePrompt={handlePrompt}
+          searchImages={searchImages}
+          handleSearchImage={handleSearchImage}
           filter={filter}
           handleFilter={handleFilter}
           selectImage={selectImage}
