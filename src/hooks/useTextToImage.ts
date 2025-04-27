@@ -21,7 +21,7 @@ export const useTextToImage = (props: useTextToImageProps) => {
         return Object.entries(category)
           .filter((item) => !!item[1])
           .map((item) => {
-            return `, ${item}`;
+            return `, ${item[1]}`;
           })
           .join('');
       })()}`;

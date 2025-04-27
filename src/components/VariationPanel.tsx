@@ -89,7 +89,7 @@ export const VariationPanel = ({
   };
 
   const handleDemo = () => {
-    handlePrompt('aaa');
+    handlePrompt('a white computer case, with rgb fans');
     handleFilter(defaultFilter);
   };
 

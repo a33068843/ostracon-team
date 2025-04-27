@@ -92,12 +92,13 @@ export const defaultFilter: AdvancedFilter = {
   cfgScale: 3.5,
   numberOfImages: 1,
   category: {
-    designStyles: '',
-    caseMaterials: '',
+    designStyles: 'RGB/ARGB Lighting',
+    caseMaterials: 'Fine mesh',
     coolingMaterials: '',
     colorsScheme: '',
-    lightingDesign: '',
+    lightingDesign: 'RGB CPU cooler tops',
     cameraAngles: '',
-    cameraTemplates: '',
+    cameraTemplates:
+      '45-degree aerial front view\n(From above at a 45° angle, focusing slightly toward the front — balanced overview + intimacy.)',
   },
 };
