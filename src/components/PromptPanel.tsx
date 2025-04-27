@@ -8,7 +8,7 @@ import type { GenerationParams } from '../Temptypes';
 import { useTextToImage } from '../hooks/useTextToImage';
 import { useInpainting } from '../hooks/useInpainting';
 import { toast } from 'react-toastify';
-import { AdvancedFilter, ImageTypes } from '../types';
+import { AdvancedFilter, defaultFilter, ImageTypes } from '../types';
 import { AdvancedSearch } from './AdvancedSearch';
 import { AIOption } from '../App';
 import { filterBase64 } from '../utils';
@@ -128,15 +128,28 @@ const PromptPanel = ({
     handleFilterChange('seed', Math.floor(Math.random() * 1000000));
   };
 
+  const handleDemo = () => {
+    handlePrompt('aaa');
+    handleFilter(defaultFilter);
+  };
+
   return (
     <>
       <h2 className='text-2xl font-bold mt-6 mb-2'>Create Image</h2>
 
       <form>
         <div className='mb-6'>
-          <label htmlFor='prompt' className='block text-sm font-medium mb-2'>
-            Prompt
-          </label>
+          <div className='flex justify-between'>
+            <label htmlFor='prompt' className='block text-sm font-medium mb-2'>
+              Prompt
+            </label>
+            <p
+              className='text-sky-500 duration-200 hover:brightness-90 cursor-pointer active:brightness-80 select-none'
+              onClick={handleDemo}
+            >
+              Demo
+            </p>
+          </div>
           <div className='relative'>
             <textarea
               id='prompt'

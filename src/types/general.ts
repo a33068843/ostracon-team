@@ -82,3 +82,22 @@ export interface AdvancedFilter {
     cameraTemplates?: string;
   };
 }
+export const defaultFilter: AdvancedFilter = {
+  width: 512,
+  height: 512,
+  seed: 991234,
+  negativeText: '',
+  maskPrompt: '',
+  similarityStrength: 0.6,
+  cfgScale: 3.5,
+  numberOfImages: 1,
+  category: {
+    designStyles: '',
+    caseMaterials: '',
+    coolingMaterials: '',
+    colorsScheme: '',
+    lightingDesign: '',
+    cameraAngles: '',
+    cameraTemplates: '',
+  },
+};

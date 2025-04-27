@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { Sparkles, Sliders, RefreshCw, ImageIcon } from 'lucide-react';
 import { useInpainting } from '../hooks/useInpainting';
-import { AdvancedFilter, ImageTypes } from '../types';
+import { AdvancedFilter, defaultFilter, ImageTypes } from '../types';
 import { AdvancedSearch } from './AdvancedSearch';
 import { AIOption } from '../App';
 import { toast } from 'react-toastify';
+import React from 'react';
 
 const IS_ONLINE = true;
 
@@ -87,15 +88,28 @@ export const InpaintingPanel = ({
     handleFilterChange('seed', Math.floor(Math.random() * 1000000));
   };
 
+  const handleDemo = () => {
+    handlePrompt('a white computer case, with rgb fans');
+    handleFilter(defaultFilter);
+  };
+
   return (
     <>
       <h2 className='text-2xl font-bold mt-6 mb-2'>Inpainting Image</h2>
 
       <form>
         <div className='mb-6'>
-          <label htmlFor='prompt' className='block text-sm font-medium mb-2'>
-            Prompt
-          </label>
+          <div className='flex justify-between'>
+            <label htmlFor='prompt' className='block text-sm font-medium mb-2'>
+              Prompt
+            </label>
+            <p
+              className='text-sky-500 duration-200 hover:brightness-90 cursor-pointer active:brightness-80 select-none'
+              onClick={handleDemo}
+            >
+              Demo
+            </p>
+          </div>
           <div className='relative'>
             <textarea
               id='prompt'
